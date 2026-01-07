@@ -1,46 +1,67 @@
 console.log("🔥 Form v2 carregado");
 
-// === SISTEMA DE ANÚNCIOS (MONETIZAÇÃO) ===
-const LINK_WHATSAPP = "https://wa.me/5561998668276?text=Cliquei%20no%20banner%20do%20site%20Conex%C3%A3o%20Chapada!";
+// === SISTEMA DE DESTAQUES (CORRIGIDO: LIMPEZA TOTAL + IMAGEM FULL) ===
+async function iniciarDestaques() {
+    const container = document.getElementById("highlightContainer");
+    if (!container) return;
 
-const ANUNCIOS = [
-    { img: 'ads/banner1.jpg', link: LINK_WHATSAPP },
-    { img: 'ads/banner2.jpg', link: LINK_WHATSAPP },
-    { img: 'ads/banner3.jpg', link: LINK_WHATSAPP }
-];
+    // Transição base
+    container.classList.add("transition-all", "duration-500", "ease-in-out");
 
-const TEMPO_ROTACAO = 15000; // 15 segundos
+    try {
+        const res = await fetch('/partners');
+        const destaques = await res.json();
 
-function iniciarAnuncios() {
-    const container = document.getElementById("adContainer");
-    if (!container || ANUNCIOS.length === 0) return; 
+        if (!destaques || destaques.length === 0) return;
 
-    let indexAtual = 0;
+        let indexAtual = 0;
+        let timer = null;
 
-    function exibirAnuncio() {
-        const ad = ANUNCIOS[indexAtual];
-        
-        container.innerHTML = `
-            <a href="${ad.link}" target="_blank" class="block w-full h-full relative group">
-                <img src="${ad.img}" alt="Publicidade" class="w-full h-auto rounded-xl shadow-sm transition transform group-hover:scale-[1.01]">
-                <div class="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded backdrop-blur-sm">Patrocinado</div>
-            </a>
-        `;
-        
-        container.classList.remove("p-6", "text-center", "border", "bg-white");
-        container.classList.add("p-0", "bg-transparent", "border-none", "shadow-none");
+        function exibirDestaque() {
+            // 1. Efeito de Saída
+            container.classList.add('opacity-0', 'scale-95');
 
-        indexAtual = (indexAtual + 1) % ANUNCIOS.length;
+            setTimeout(() => {
+                const item = destaques[indexAtual];
+                
+                // 2. Troca o HTML
+                // w-full h-auto: Imagem se ajusta à largura e define sua própria altura (não corta)
+                container.innerHTML = `
+                    <a href="${item.link}" target="_blank" class="block w-full h-full relative group">
+                        <img src="${item.img}" alt="Destaque" class="w-full h-auto rounded-xl shadow-sm transition transform group-hover:scale-[1.01]">
+                        <div class="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded backdrop-blur-sm">Parceiro</div>
+                    </a>
+                `;
+                
+                // 3. LIMPEZA RADICAL
+                // Substitui todas as classes do container para remover estilos de "caixa branca"
+                // mt-8: margem superior necessária no form
+                container.className = "mt-8 relative transition-all duration-500 ease-in-out transform";
+
+                // 4. Efeito de Entrada
+                requestAnimationFrame(() => {
+                    container.classList.remove('opacity-0', 'scale-95');
+                });
+
+                const tempo = item.duration || 15000;
+                indexAtual = (indexAtual + 1) % destaques.length;
+
+                if (timer) clearTimeout(timer);
+                timer = setTimeout(exibirDestaque, tempo + 600);
+            }, 500);
+        }
+
+        exibirDestaque();
+
+    } catch (err) {
+        console.error("Erro ao carregar destaques:", err);
+        container.classList.remove('opacity-0', 'scale-95');
     }
-
-    exibirAnuncio();
-    setInterval(exibirAnuncio, TEMPO_ROTACAO);
 }
 
-// Inicia os anúncios
-iniciarAnuncios();
+iniciarDestaques();
 
-// === CÓDIGO DO FORMULÁRIO (EXISTENTE) ===
+// === RESTO DO CÓDIGO (MANTENHA IGUAL) ===
 
 document.getElementById("year").textContent = new Date().getFullYear();
 
@@ -62,7 +83,6 @@ CIDADES.sort().forEach(c => {
 });
 
 const params = new URLSearchParams(window.location.search);
-// Aqui você pode mudar o título se quiser, mas a lógica de 'type' é interna
 const tipoURL = params.get("type") === "request" ? "request" : "offer";
 document.getElementById("formTitle").textContent = tipoURL === "offer" ? "Oferecer Carona" : "Solicitar Carona";
 
@@ -83,7 +103,7 @@ rideForm.addEventListener("submit", async (e) => {
   const destination = destinoEl.value;
 
   if (origin === destination) {
-      alert("⚠️ Erro: Você não pode selecionar a mesma cidade para Origem e Destino!");
+      alert("⚠️ Erro: Origem e Destino iguais!");
       origemEl.classList.add("border-red-500", "bg-red-50");
       destinoEl.classList.add("border-red-500", "bg-red-50");
       return;
@@ -102,7 +122,7 @@ rideForm.addEventListener("submit", async (e) => {
     pet: document.getElementById("pet").checked,
     package: document.getElementById("encomenda").checked,
     baggage: document.getElementById("mala_g").checked,
-    only_woman: document.getElementById("only_woman").checked // <--- Captura o valor do checkbox Rosa
+    only_woman: document.getElementById("only_woman").checked
   };
 
   try {
@@ -122,6 +142,6 @@ rideForm.addEventListener("submit", async (e) => {
 
   } catch (err) {
     console.error(err);
-    alert("Erro ao enviar carona. Verifique sua conexão.");
+    alert("Erro ao enviar carona.");
   }
 });

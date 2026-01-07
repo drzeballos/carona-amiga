@@ -8,25 +8,24 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
-
-// 📦 Servir frontend
 app.use(express.static(path.join(__dirname, "public")));
 
 const {
   PORT = 3001,
   NOCODB_BASE_URL,
   NOCODB_API_TOKEN,
-  NOCODB_TABLE
+  NOCODB_TABLE,
+  NOCODB_ADS_TABLE
 } = process.env;
 
-if (!NOCODB_BASE_URL || !NOCODB_API_TOKEN || !NOCODB_TABLE) {
+if (!NOCODB_BASE_URL || !NOCODB_API_TOKEN || !NOCODB_TABLE || !NOCODB_ADS_TABLE) {
   console.error("❌ ERRO: Variáveis do NocoDB faltando no .env");
   process.exit(1);
 }
 
 // 🔗 Cliente NocoDB
-const api = axios.create({
-  baseURL: `${NOCODB_BASE_URL}/api/v2/tables/${NOCODB_TABLE}/records`,
+const nocoClient = axios.create({
+  baseURL: `${NOCODB_BASE_URL}/api/v2/tables`,
   headers: {
     "xc-token": NOCODB_API_TOKEN,
     "Content-Type": "application/json"
@@ -35,85 +34,93 @@ const api = axios.create({
 
 app.get("/health", (_, res) => res.json({ status: "API Online" }));
 
-// 📄 Listar caronas (Com filtro de REMOVIDAS e EXPIRADAS)
+// 🤝 ROTA PARCEIROS (Ordenada por DURAÇÃO)
+app.get("/partners", async (_, res) => {
+    try {
+        const { data } = await nocoClient.get(`/${NOCODB_ADS_TABLE}/records`, {
+            // MUDANÇA AQUI:
+            // '-duration' = Ordenar por duração decrescente (Maior tempo primeiro)
+            // '-Id' = Critério de desempate (Mais novo primeiro)
+            params: { limit: 20, sort: '-duration,-Id' }
+        });
+
+        const list = data.list || [];
+
+        const ads = list.map(item => {
+            let finalUrl = '';
+            
+            // 1. Lógica para Uploads
+            if (item.image && Array.isArray(item.image) && item.image.length > 0) {
+                const fileData = item.image[0];
+                let rawPath = fileData.signedUrl || fileData.url || fileData.path;
+
+                if (rawPath) {
+                    if (rawPath.startsWith('http')) {
+                        try {
+                            const parsedUrl = new URL(rawPath);
+                            rawPath = parsedUrl.pathname + parsedUrl.search;
+                        } catch (e) {}
+                    }
+                    const base = NOCODB_BASE_URL.replace(/\/$/, "");
+                    const path = rawPath.replace(/^\//, "");
+                    finalUrl = `${base}/${path}`;
+                }
+            } 
+            // 2. Lógica para Links de Texto
+            else if (typeof item.image === 'string') {
+                finalUrl = item.image;
+            }
+
+            return {
+                link: item.link || '#',
+                img: finalUrl,
+                duration: parseInt(item.duration) || 15000
+            };
+        }).filter(ad => ad.img !== '');
+
+        res.json(ads);
+
+    } catch (err) {
+        console.error("ERRO GET /partners:", err.message);
+        res.json([]);
+    }
+});
+
+// 📄 ROTA: Listar caronas
 app.get("/rides", async (_, res) => {
   try {
-    // Busca caronas que não estão marcadas como expiradas
-    const { data } = await api.get("/", {
-      params: { 
-        limit: 100, 
-        sort: 'date', 
-        where: '(status,neq,expired)' 
-      } 
+    const { data } = await nocoClient.get(`/${NOCODB_TABLE}/records`, {
+      params: { limit: 100, sort: 'date', where: '(status,neq,expired)' } 
     });
-    
-    const rawList = data.list || [];
-    
-    // Data de hoje no formato YYYY-MM-DD (Fuso horário do Brasil)
     const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
-
     const activeRides = [];
-
-    for (const ride of rawList) {
-        // 🛑 FILTRO: Se estiver "removed", ignora imediatamente
-        if (ride.status === 'removed') {
-            continue; 
-        }
-
-        // 📅 Lógica de Data (Verifica expiração)
+    for (const ride of (data.list || [])) {
+        if (ride.status === 'removed') continue; 
         if (ride.date && ride.date < today) {
-            console.log(`🗑️ Expirando carona antiga: ${ride.date} (ID: ${ride.Id})`);
-            
-            // Atualiza status para expired no banco
-            api.patch("", { Id: ride.Id, status: "expired" }).catch(e => console.error("Erro ao expirar:", e.message));
+            nocoClient.patch(`/${NOCODB_TABLE}/records`, { Id: ride.Id, status: "expired" }).catch(console.error);
         } else {
-            // Se não for removida E a data for válida, adiciona na lista
             activeRides.push(ride);
         }
     }
-
     res.json(activeRides);
-
   } catch (err) {
-    console.error("ERRO GET /rides:", err.response?.data || err.message);
-    res.status(500).json({ error: "Erro ao buscar caronas" });
+    console.error("ERRO GET /rides:", err.message);
+    res.status(500).json({ error: "Erro" });
   }
 });
 
-// ➕ Criar carona (Atualizado com only_woman)
+// ➕ ROTA: Criar carona
 app.post("/rides", async (req, res) => {
   try {
-    const {
-      type, name, phone, origin, destination, 
-      date, time, seats, price, pet, 
-      package: pkg, baggage,
-      only_woman // <--- 1. Recebendo o novo campo
-    } = req.body;
-
-    const payload = {
-      type, name, phone, origin, destination, date, time,
-      price: parseFloat(price) || 0,
-      seats: parseInt(seats) || 1,
-      pet: !!pet,
-      package: !!pkg,
-      baggage: !!baggage,
-      only_woman: !!only_woman, // <--- 2. Enviando para o NocoDB (como booleano)
-      status: "active" // Cria sempre como ativa
-    };
-
-    const { data } = await api.post("", payload);
+    const { only_woman, pet, package: pkg, baggage, price, seats, ...rest } = req.body;
+    const payload = { ...rest, price: parseFloat(price)||0, seats: parseInt(seats)||1, pet: !!pet, package: !!pkg, baggage: !!baggage, only_woman: !!only_woman, status: "active" };
+    const { data } = await nocoClient.post(`/${NOCODB_TABLE}/records`, payload);
     res.status(201).json(data);
-
   } catch (err) {
-    console.error("ERRO POST /rides:", err.response?.data || err.message);
+    console.error("ERRO POST /rides:", err.message);
     res.status(500).json({ error: "Erro ao salvar carona" });
   }
 });
 
-app.get("*", (_, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
-});
-
-app.listen(PORT, () => {
-  console.log(`🚀 Conexão Chapada rodando na porta ${PORT}`);
-});
+app.get("*", (_, res) => res.sendFile(path.join(__dirname, "public", "index.html")));
+app.listen(PORT, () => console.log(`🚀 Conexão Chapada rodando na porta ${PORT}`));
