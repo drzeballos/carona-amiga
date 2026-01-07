@@ -55,12 +55,12 @@ app.get("/rides", async (_, res) => {
     const activeRides = [];
 
     for (const ride of rawList) {
-        // 🛑 FILTRO NOVO: Se estiver "removed", ignora imediatamente e pula para o próximo
+        // 🛑 FILTRO: Se estiver "removed", ignora imediatamente
         if (ride.status === 'removed') {
             continue; 
         }
 
-        // 📅 Lógica de Data (já existente)
+        // 📅 Lógica de Data (Verifica expiração)
         if (ride.date && ride.date < today) {
             console.log(`🗑️ Expirando carona antiga: ${ride.date} (ID: ${ride.Id})`);
             
@@ -80,13 +80,14 @@ app.get("/rides", async (_, res) => {
   }
 });
 
-// ➕ Criar carona
+// ➕ Criar carona (Atualizado com only_woman)
 app.post("/rides", async (req, res) => {
   try {
     const {
       type, name, phone, origin, destination, 
       date, time, seats, price, pet, 
-      package: pkg, baggage
+      package: pkg, baggage,
+      only_woman // <--- 1. Recebendo o novo campo
     } = req.body;
 
     const payload = {
@@ -96,6 +97,7 @@ app.post("/rides", async (req, res) => {
       pet: !!pet,
       package: !!pkg,
       baggage: !!baggage,
+      only_woman: !!only_woman, // <--- 2. Enviando para o NocoDB (como booleano)
       status: "active" // Cria sempre como ativa
     };
 

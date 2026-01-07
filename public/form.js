@@ -62,6 +62,7 @@ CIDADES.sort().forEach(c => {
 });
 
 const params = new URLSearchParams(window.location.search);
+// Aqui você pode mudar o título se quiser, mas a lógica de 'type' é interna
 const tipoURL = params.get("type") === "request" ? "request" : "offer";
 document.getElementById("formTitle").textContent = tipoURL === "offer" ? "Oferecer Carona" : "Solicitar Carona";
 
@@ -100,7 +101,8 @@ rideForm.addEventListener("submit", async (e) => {
     seats: document.getElementById("vagas").value,
     pet: document.getElementById("pet").checked,
     package: document.getElementById("encomenda").checked,
-    baggage: document.getElementById("mala_g").checked
+    baggage: document.getElementById("mala_g").checked,
+    only_woman: document.getElementById("only_woman").checked // <--- Captura o valor do checkbox Rosa
   };
 
   try {
