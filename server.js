@@ -53,6 +53,7 @@ app.get("/rides", async (_, res) => {
     const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
 
     const activeRides = [];
+    const ridesToExpire = [];
 
     for (const ride of rawList) {
         // 🛑 FILTRO NOVO: Se estiver "removed", ignora imediatamente e pula para o próximo
@@ -63,13 +64,21 @@ app.get("/rides", async (_, res) => {
         // 📅 Lógica de Data (já existente)
         if (ride.date && ride.date < today) {
             console.log(`🗑️ Expirando carona antiga: ${ride.date} (ID: ${ride.Id})`);
-            
-            // Atualiza status para expired no banco
-            api.patch("", { Id: ride.Id, status: "expired" }).catch(e => console.error("Erro ao expirar:", e.message));
+            ridesToExpire.push(ride.Id);
         } else {
             // Se não for removida E a data for válida, adiciona na lista
             activeRides.push(ride);
         }
+    }
+
+    // Batch update expired rides after collecting all IDs
+    if (ridesToExpire.length > 0) {
+        Promise.all(
+            ridesToExpire.map(id => 
+                api.patch("", { Id: id, status: "expired" })
+                    .catch(e => console.error(`Erro ao expirar ID ${id}:`, e.message))
+            )
+        ).catch(e => console.error("Erro no batch de expirações:", e.message));
     }
 
     res.json(activeRides);
