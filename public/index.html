@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conexão Chapada</title>
+    
+    <meta property="og:title" content="Conexão Chapada - Caronas Solidárias">
+    <meta property="og:description" content="Encontre ou ofereça caronas entre Brasília, Goiânia e a Chapada dos Veadeiros de forma fácil e rápida!">
+    <meta property="og:image" content="https://conexaochapada.bots.at.eu.org/img/conexao-chapada-foto.jpeg">
+    <meta property="og:url" content="https://conexaochapada.bots.at.eu.org/">
+    <meta property="og:type" content="website">
+    <meta name="theme-color" content="#15803d"> 
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="/favicon.ico">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col selection:bg-green-200">
+
+    <header class="bg-gradient-to-r from-green-700 to-green-500 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-3xl mx-auto px-4 py-6 flex justify-between items-center">
+            <a href="/" class="text-xl font-bold tracking-tight hover:opacity-90 transition flex items-center gap-2">
+                Conexão Chapada
+            </a>
+            
+            <div class="space-x-2">
+                <a href="form.html?type=offer" class="px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-sm font-medium transition border border-white/10">Oferecer</a>
+                <a href="form.html?type=request" class="px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-sm font-medium transition border border-white/10">Solicitar</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-4 py-6 w-full flex-1">
+
+        <div id="adContainer" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-6 text-center relative overflow-hidden transition-all duration-500">
+            <div id="adDefaultContent" class="border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 h-32 flex flex-col items-center justify-center text-gray-400 gap-2 hover:bg-gray-100 transition cursor-pointer">
+                <span class="text-2xl">📢</span>
+                <span class="font-medium">Espaço para Publicidade</span>
+                <a href="https://wa.me/5561998668276?text=Quero%20anunciar%20no%20Conexão%20Chapada!" 
+                   target="_blank"
+                   class="text-xs text-green-600 font-bold underline hover:text-green-800">
+                    Divulgue seu negócio aqui
+                </a>
+            </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 mb-6 sticky top-24 z-40">
+            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Filtrar Caronas</h3>
+            <div class="flex flex-col md:flex-row gap-3">
+                <select id="filterOrigin" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 outline-none transition">
+                    <option value="">🏠 Todas as Origens</option>
+                </select>
+                <select id="filterDestination" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 outline-none transition">
+                    <option value="">🏁 Todos os Destinos</option>
+                </select>
+            </div>
+        </div>
+
+        <h2 class="text-xl font-bold text-gray-700 mb-4 px-1 flex justify-between items-center">
+            Últimas Caronas
+            <span id="rideCount" class="text-sm font-normal text-gray-400 bg-gray-200 px-2 py-1 rounded-lg">Loading...</span>
+        </h2>
+
+        <div id="ridesContainer" class="space-y-4 pb-6"></div>
+
+    </main>
+
+    <footer class="bg-gray-100 border-t border-gray-200 py-4 mt-auto">
+        <div class="text-center">
+            <a href="https://zeballos.com.br" target="_blank" class="text-xs text-gray-400 hover:text-green-600 transition font-medium">
+                &copy; <span id="year"></span> Zeballos Tecnologia
+            </a>
+        </div>
+    </footer>
+
+    <script src="app.js" charset="UTF-8"></script>
+</body>
+</html>

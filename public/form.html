@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conexão Chapada - Formulário</title>
+
+    <meta property="og:title" content="Oferecer ou Pedir Carona - Conexão Chapada">
+    <meta property="og:description" content="Preencha o formulário rápido e encontre sua carona para a Chapada dos Veadeiros.">
+    <meta property="og:image" content="https://conexaochapada.bots.at.eu.org/img/conexao-chapada-foto.jpeg">
+    <meta property="og:url" content="https://conexaochapada.bots.at.eu.org/form.html">
+    <meta property="og:type" content="website">
+    <meta name="theme-color" content="#15803d">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+</head>
+<body class="bg-stone-50 text-stone-800 font-sans min-h-screen flex flex-col selection:bg-green-200">
+
+    <header class="bg-gradient-to-r from-green-700 to-green-500 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-3xl mx-auto px-4 py-6 flex justify-between items-center">
+            <a href="index.html" class="text-xl font-bold tracking-tight hover:opacity-90 transition flex items-center gap-2">
+                Conexão Chapada
+            </a>
+            <div class="space-x-2">
+                <a href="form.html?type=offer" class="px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-sm font-medium transition border border-white/10">Oferecer</a>
+                <a href="form.html?type=request" class="px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-sm font-medium transition border border-white/10">Solicitar</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-4 py-6 w-full flex-1">
+
+        <h1 class="text-2xl font-bold text-stone-800 mb-4" id="formTitle">Formulário de Carona</h1>
+
+        <form id="rideForm" class="bg-white p-6 rounded-2xl shadow-sm border border-stone-200 space-y-4">
+            <div>
+                <label class="block text-sm font-medium mb-1">Nome do Usuário</label>
+                <input type="text" id="name" required placeholder="Seu nome completo" class="w-full p-2.5 border border-stone-200 rounded-xl bg-stone-50 text-sm focus:ring-2 focus:ring-green-500 outline-none transition" />
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Origem</label>
+                    <select id="origem" required class="w-full p-2.5 border border-stone-200 rounded-xl bg-stone-50 text-sm focus:ring-2 focus:ring-green-500 outline-none transition"></select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Destino</label>
+                    <select id="destino" required class="w-full p-2.5 border border-stone-200 rounded-xl bg-stone-50 text-sm focus:ring-2 focus:ring-green-500 outline-none transition"></select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Data</label>
+                    <input type="date" id="data" required class="w-full p-2.5 border border-stone-200 rounded-xl bg-stone-50 text-sm focus:ring-2 focus:ring-green-500 outline-none transition" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Hora</label>
+                    <input type="time" id="hora" required class="w-full p-2.5 border border-stone-200 rounded-xl bg-stone-50 text-sm focus:ring-2 focus:ring-green-500 outline-none transition" />
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Valor (R$)</label>
+                    <input type="number" id="valor" required min="0" step="0.01" placeholder="0,00" class="w-full p-2.5 border border-stone-200 rounded-xl bg-stone-50 text-sm focus:ring-2 focus:ring-green-500 outline-none transition" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Vagas</label>
+                    <input type="number" id="vagas" required min="1" value="1" class="w-full p-2.5 border border-stone-200 rounded-xl bg-stone-50 text-sm focus:ring-2 focus:ring-green-500 outline-none transition" />
+                </div>
+            </div>
+
+            <div class="flex gap-4 items-center flex-wrap">
+                <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                    <input type="checkbox" id="pet" class="rounded text-green-600 focus:ring-green-500 w-5 h-5" />
+                    <span class="text-sm">Pet</span>
+                </label>
+                <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                    <input type="checkbox" id="encomenda" class="rounded text-green-600 focus:ring-green-500 w-5 h-5" />
+                    <span class="text-sm">Encomenda</span>
+                </label>
+                <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                    <input type="checkbox" id="mala_g" class="rounded text-green-600 focus:ring-green-500 w-5 h-5" />
+                    <span class="text-sm">Mala G</span>
+                </label>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-1">Telefone (WhatsApp)</label>
+                <input type="tel" id="phone" required placeholder="DDD + Número" class="w-full p-2.5 border border-stone-200 rounded-xl bg-stone-50 text-sm focus:ring-2 focus:ring-green-500 outline-none transition" />
+            </div>
+
+            <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl font-bold transition shadow-lg shadow-green-200">
+                Enviar Carona
+            </button>
+        </form>
+
+        <div id="successMsg" class="hidden mt-4 p-4 bg-green-100 text-green-700 rounded-xl text-center font-medium border border-green-200 animate-pulse">
+            ✅ Carona enviada com sucesso! Redirecionando...
+        </div>
+
+        <div id="adContainer" class="mt-8 bg-white p-6 rounded-2xl shadow-sm border border-gray-200 text-center relative overflow-hidden transition-all duration-500">
+            <div id="adDefaultContent" class="border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 h-32 flex flex-col items-center justify-center text-gray-400 gap-2 hover:bg-gray-100 transition cursor-pointer">
+                <span class="text-2xl">📢</span>
+                <span class="font-medium">Espaço para Publicidade</span>
+                <a href="https://wa.me/5561998668276?text=Quero%20anunciar%20no%20Conexão%20Chapada!" 
+                   target="_blank"
+                   class="text-xs text-green-600 font-bold underline hover:text-green-800">
+                    Divulgue seu negócio aqui
+                </a>
+            </div>
+        </div>
+        </main>
+
+    <footer class="bg-gray-100 border-t border-stone-200 py-4 mt-auto">
+        <div class="text-center">
+            <a href="https://zeballos.com.br" target="_blank" class="text-xs text-gray-400 hover:text-green-600 transition font-medium">
+                &copy; <span id="year"></span> Zeballos Tecnologia
+            </a>
+        </div>
+    </footer>
+
+    <script src="form.js" charset="UTF-8"></script>
+</body>
+</html>
