@@ -23,7 +23,7 @@ Você precisará ter o [Docker](https://www.docker.com/) instalado.
 
 1.  **Clone o repositório:**
     ```bash
-    git clone [https://github.com/SEU-USUARIO/nome-do-repo.git](https://github.com/SEU-USUARIO/nome-do-repo.git)
+    git clone [https://github.com/drzeballos/nome-do-repo.git](https://github.com/drzeballos/nome-do-repo.git)
     cd nome-do-repo
     ```
 
@@ -49,4 +49,4 @@ Você precisará ter o [Docker](https://www.docker.com/) instalado.
 Sinta-se à vontade para fazer um "Fork" deste projeto, melhorar o código e enviar um Pull Request. Vamos conectar comunidades!
 
 ---
-Desenvolvido com ❤️ e IA.
+Desenvolvido com ❤️ e ☕
