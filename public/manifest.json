@@ -1,0 +1,22 @@
+{
+  "name": "Conexão Chapada",
+  "short_name": "Conexão",
+  "description": "Caronas solidárias para a Chapada dos Veadeiros.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fafaf9",
+  "theme_color": "#15803d",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/img/conexao-chapada-192-pwa.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/img/conexao-chapada-512-pwa.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
