@@ -7,7 +7,6 @@ async function iniciarDestaques() {
     const container = document.getElementById("highlightContainer"); 
     if (!container) return;
 
-    // Adiciona transição base
     container.classList.add("transition-all", "duration-500", "ease-in-out");
 
     try {
@@ -20,14 +19,11 @@ async function iniciarDestaques() {
         let timer = null;
 
         function exibirDestaque() {
-            // 1. Efeito de Saída
             container.classList.add('opacity-0', 'scale-95');
 
             setTimeout(() => {
                 const item = destaques[indexAtual];
                 
-                // 2. Troca o HTML
-                // Nota: w-full e h-auto garantem que a imagem NUNCA seja cortada
                 container.innerHTML = `
                     <a href="${item.link}" target="_blank" class="block w-full h-full relative group">
                         <img src="${item.img}" alt="Destaque" class="w-full h-auto rounded-xl shadow-sm transition transform group-hover:scale-[1.01]">
@@ -35,14 +31,8 @@ async function iniciarDestaques() {
                     </a>
                 `;
 
-                // 3. LIMPEZA TOTAL DA CAIXA BRANCA
-                // Aqui redefinimos as classes do container para remover TUDO (borda, fundo branco, padding, sombra)
-                // Mantemos apenas o espaçamento (mb-6) e as classes de transição
                 container.className = "mb-6 relative transition-all duration-500 ease-in-out transform";
 
-                // 4. Efeito de Entrada
-                // Removemos opacity-0 e scale-95 para a imagem aparecer
-                // Pequeno delay para o navegador processar a troca de classe
                 requestAnimationFrame(() => {
                     container.classList.remove('opacity-0', 'scale-95');
                 });
@@ -66,7 +56,8 @@ async function iniciarDestaques() {
 
 iniciarDestaques();
 
-// === RESTO DO CÓDIGO (MANTENHA IGUAL) ===
+// === RESTO DO CÓDIGO ===
+
 const CIDADES = [
   "Brasília", "Goiânia", "Anápolis", "Formosa", "Cavalcante",
   "Teresina de Goiás", "Vila de São Jorge", "São Gabriel da Cachoeira",
@@ -150,6 +141,10 @@ async function loadRides() {
       
       const textoOpcionais = opcionais.length > 0 ? opcionais.join(', ') : "Nenhum opcional";
 
+      // 🔗 Link da carona individual
+      const linkCarona = `https://conexaochapada.bots.at.eu.org/carona.html?id=${ride.Id}`;
+      const linkCaronaRelativo = `carona.html?id=${ride.Id}`;
+
       const whatsappMsg = `Olá *${ride.name}*! Vi seu anúncio de *${tipoTermo}* no Conexão Chapada!
 De: ${ride.origin}
 Para: ${ride.destination}
@@ -158,7 +153,7 @@ Valor: R$ ${valorFormatado}
 Detalhes: ${textoOpcionais}
 
 ---
-https://conexaochapada.bots.at.eu.org
+${linkCarona}
 \`\`\`Zeballos Tecnologia\`\`\``;
 
       const whatsappUrl = `https://wa.me/55${ride.phone.replace(/\D/g, '')}?text=${encodeURIComponent(whatsappMsg)}`;
@@ -166,9 +161,11 @@ https://conexaochapada.bots.at.eu.org
       const badgeColor = isOffer ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800";
       const badgeText = isOffer ? "OFEREÇO" : "PROCURO";
 
+      // HTML DO CARD ATUALIZADO (Com botão de link)
       container.innerHTML += `
         <div class="ride-card bg-white rounded-2xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition relative overflow-hidden" data-origin="${ride.origin}" data-dest="${ride.destination}">
           <div class="absolute left-0 top-0 bottom-0 w-1 ${isOffer ? 'bg-green-500' : 'bg-blue-500'}"></div>
+          
           <div class="flex justify-between items-start mb-3 pl-2">
             <div>
                 <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2">${ride.name || "Viajante"} ${ride.only_woman ? '<span title="Exclusivo para Mulheres">👩</span>' : ''}</h3>
@@ -179,10 +176,12 @@ https://conexaochapada.bots.at.eu.org
                 <span class="text-xs text-gray-400 font-medium">${formatDateBR(ride.date)} • ${ride.time}</span>
             </div>
           </div>
+
           <div class="mb-4 text-sm text-gray-600 space-y-1 pl-2 border-l-2 border-gray-100 ml-1">
             <p class="flex items-center gap-2"><span class="text-gray-400">Origem:</span> <strong class="text-gray-800">${ride.origin}</strong></p>
             <p class="flex items-center gap-2"><span class="text-gray-400">Destino:</span> <strong class="text-gray-800">${ride.destination}</strong></p>
           </div>
+
           <div class="flex gap-2 flex-wrap mb-4 pl-2">
             ${ride.only_woman ? `<span class="bg-pink-100 text-pink-700 text-xs px-2 py-1 rounded border border-pink-200 font-bold">👩 Só Mulheres</span>` : ''}
             ${ride.seats ? `<span class="bg-gray-50 text-gray-600 text-xs px-2 py-1 rounded border border-gray-200">💺 ${ride.seats} vagas</span>` : ''}
@@ -190,7 +189,14 @@ https://conexaochapada.bots.at.eu.org
             ${ride.package ? `<span class="bg-blue-50 text-blue-600 text-xs px-2 py-1 rounded border border-blue-100">📦 Enc.</span>` : ''}
             ${ride.baggage ? `<span class="bg-purple-50 text-purple-600 text-xs px-2 py-1 rounded border border-purple-100">🎒 Mala</span>` : ''}
           </div>
-          <a href="${whatsappUrl}" target="_blank" class="flex items-center justify-center gap-2 w-full bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 font-bold transition shadow-green-100 shadow-lg">WhatsApp</a>
+
+          <div class="flex gap-2">
+             <a href="${whatsappUrl}" target="_blank" class="flex-1 flex items-center justify-center gap-2 bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 font-bold transition shadow-green-100 shadow-lg">WhatsApp</a>
+             <a href="${linkCaronaRelativo}" class="px-4 py-3 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 font-bold transition flex items-center justify-center border border-gray-200" title="Ver detalhes e link">
+                🔗
+             </a>
+          </div>
+
         </div>`;
     });
     rideCount.textContent = `${rides.length} caronas`;

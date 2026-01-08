@@ -70,7 +70,7 @@ const CIDADES = [
   "Teresina de Goiás", "Vila de São Jorge", "São Gabriel da Cachoeira",
   "Aeroporto de Brasília", "Rodoviária Interestadual de Brasília",
   "Rodoviária do Plano Piloto", "Alto Paraíso", "São João da Aliança",
-  "Bar do Jacaré - Km 12 GO-239",
+  "Budega do Jacaré - Km 12 GO-239",
   "Colinas do Sul"
 ];
 

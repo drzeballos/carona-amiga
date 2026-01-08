@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes da Carona - Conexão Chapada</title>
+    
+    <meta property="og:title" content="Conexão Chapada - Detalhes da Carona">
+    <meta property="og:description" content="Confira os detalhes desta carona solidária!">
+    <meta name="theme-color" content="#15803d"> 
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="/favicon.ico">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col selection:bg-green-200">
+
+    <header class="bg-gradient-to-r from-green-700 to-green-500 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-3xl mx-auto px-4 py-6 flex justify-between items-center">
+            <a href="/" class="text-xl font-bold tracking-tight hover:opacity-90 transition flex items-center gap-2">
+                Conexão Chapada
+            </a>
+            <a href="/" class="text-sm font-medium bg-white/20 hover:bg-white/30 px-3 py-1 rounded-lg transition border border-white/10">
+                Ver todas
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-xl mx-auto px-4 py-10 w-full flex-1 flex flex-col items-center justify-center">
+        
+        <div id="singleRideContainer" class="w-full">
+            <div class="animate-pulse h-64 bg-gray-200 rounded-2xl w-full"></div>
+        </div>
+
+        <div class="mt-8 text-center">
+            <a href="/" class="text-green-600 font-bold hover:underline">← Voltar para a lista de caronas</a>
+        </div>
+
+    </main>
+
+    <footer class="bg-gray-100 border-t border-gray-200 py-4 mt-auto">
+        <div class="text-center">
+            <a href="https://zeballos.com.br" target="_blank" class="text-xs text-gray-400 hover:text-green-600 transition font-medium">
+                &copy; <span id="year"></span> Zeballos Tecnologia
+            </a>
+        </div>
+    </footer>
+
+    <script src="carona.js"></script>
+</body>
+</html>

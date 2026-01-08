@@ -34,22 +34,22 @@ const nocoClient = axios.create({
 
 app.get("/health", (_, res) => res.json({ status: "API Online" }));
 
-// 🤝 ROTA PARCEIROS (Ordenada por DURAÇÃO)
+// 🤝 ROTA PARCEIROS (COM ORDENAÇÃO FORÇADA NO JS)
 app.get("/partners", async (_, res) => {
     try {
+        // 1. Buscamos mais registros (100) para garantir que pegamos os "pagantes"
+        // mesmo que eles tenham sido cadastrados há muito tempo.
         const { data } = await nocoClient.get(`/${NOCODB_ADS_TABLE}/records`, {
-            // MUDANÇA AQUI:
-            // '-duration' = Ordenar por duração decrescente (Maior tempo primeiro)
-            // '-Id' = Critério de desempate (Mais novo primeiro)
-            params: { limit: 20, sort: '-duration,-Id' }
+            params: { limit: 100, sort: '-Id' }
         });
 
         const list = data.list || [];
 
-        const ads = list.map(item => {
+        // 2. Processamos as imagens e URLs
+        let ads = list.map(item => {
             let finalUrl = '';
             
-            // 1. Lógica para Uploads
+            // Lógica para Uploads
             if (item.image && Array.isArray(item.image) && item.image.length > 0) {
                 const fileData = item.image[0];
                 let rawPath = fileData.signedUrl || fileData.url || fileData.path;
@@ -66,7 +66,7 @@ app.get("/partners", async (_, res) => {
                     finalUrl = `${base}/${path}`;
                 }
             } 
-            // 2. Lógica para Links de Texto
+            // Lógica para Links de Texto
             else if (typeof item.image === 'string') {
                 finalUrl = item.image;
             }
@@ -74,9 +74,24 @@ app.get("/partners", async (_, res) => {
             return {
                 link: item.link || '#',
                 img: finalUrl,
-                duration: parseInt(item.duration) || 15000
+                duration: parseInt(item.duration) || 15000,
+                originalId: item.Id // Guardamos o ID original para desempate
             };
         }).filter(ad => ad.img !== '');
+
+        // 3. A MÁGICA ACONTECE AQUI: Ordenação Manual no JavaScript
+        // Ordena do MAIOR tempo para o MENOR tempo.
+        ads.sort((a, b) => {
+            // Primeiro critério: Quem tem maior duração ganha
+            if (b.duration !== a.duration) {
+                return b.duration - a.duration;
+            }
+            // Critério de desempate: O mais novo (maior ID) ganha
+            return b.originalId - a.originalId;
+        });
+
+        // 4. Se tiver muitos, pega só os top 20
+        ads = ads.slice(0, 20);
 
         res.json(ads);
 
@@ -86,7 +101,7 @@ app.get("/partners", async (_, res) => {
     }
 });
 
-// 📄 ROTA: Listar caronas
+// 📄 ROTA: Listar todas as caronas ativas
 app.get("/rides", async (_, res) => {
   try {
     const { data } = await nocoClient.get(`/${NOCODB_TABLE}/records`, {
@@ -122,5 +137,20 @@ app.post("/rides", async (req, res) => {
   }
 });
 
+// 🔍 [NOVA ROTA] Buscar UMA carona específica pelo ID
+app.get("/rides/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    // Busca direto no NocoDB pelo ID
+    const { data } = await nocoClient.get(`/${NOCODB_TABLE}/records/${id}`);
+    res.json(data);
+  } catch (err) {
+    console.error(`Erro ao buscar carona ${req.params.id}:`, err.message);
+    res.status(404).json({ error: "Carona não encontrada ou removida." });
+  }
+});
+
+// Rota coringa (serve o frontend)
 app.get("*", (_, res) => res.sendFile(path.join(__dirname, "public", "index.html")));
+
 app.listen(PORT, () => console.log(`🚀 Conexão Chapada rodando na porta ${PORT}`));
