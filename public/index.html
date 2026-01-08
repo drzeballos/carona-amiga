@@ -19,14 +19,15 @@
     <link rel="icon" href="/favicon.ico">
 </head>
 <body class="bg-stone-50 text-stone-800 font-sans min-h-screen flex flex-col selection:bg-green-200">
-    <header class="bg-gradient-to-r from-green-700 to-green-500 text-white shadow-lg sticky top-0 z-50">
+        <header class="bg-gradient-to-r from-green-700 to-green-500 text-white shadow-lg sticky top-0 z-50">
         <div class="max-w-3xl mx-auto px-4 py-6 flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-bold tracking-tight flex items-center gap-2">
-                    Conexão Chapada <span class="text-xs bg-white/20 px-2 py-1 rounded-full uppercase tracking-wider">Beta</span>
+            <a href="/" class="group">
+                <h1 class="text-2xl font-bold tracking-tight flex items-center gap-2 group-hover:opacity-90 transition">
+                    Conexão Chapada <span class="text-xs bg-white/20 px-2 py-1 rounded-full uppercase tracking-wider border border-white/10">Beta</span>
                 </h1>
-                <p class="text-sm text-green-100 mt-1 opacity-90">Caronas solidárias num pulo!</p>
-            </div>
+                <p class="text-sm text-green-100 mt-1 opacity-90 group-hover:underline decoration-green-300/50 underline-offset-2">Caronas solidárias num pulo!</p>
+            </a>
+            
             <div class="space-x-2 flex">
                 <a href="form.html?type=offer" class="px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-sm font-bold transition border border-white/10 shadow-sm hidden md:block">Oferecer</a>
                 <a href="form.html?type=request" class="px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-sm font-bold transition border border-white/10 shadow-sm hidden md:block">Solicitar</a>
@@ -36,7 +37,10 @@
 
     <main class="max-w-3xl mx-auto px-4 py-6 w-full flex-1">
         
-        <div class="grid grid-cols-2 gap-4 mb-8 md:hidden">
+        <div id="highlightContainer" class="mb-6 relative overflow-hidden rounded-xl transition-all duration-500 opacity-0 scale-95 shadow-sm min-h-[100px]">
+            </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-6 md:hidden">
             <a href="form.html?type=offer" class="flex flex-col items-center justify-center bg-green-600 text-white p-4 rounded-2xl shadow-lg hover:bg-green-700 transition border-b-4 border-green-800 active:border-b-0 active:translate-y-1">
                 <span class="text-3xl mb-2">🚙</span>
                 <span class="font-bold">Oferecer Carona</span>
@@ -62,9 +66,6 @@
             </div>
         </div>
 
-        <div id="highlightContainer" class="mb-6 relative overflow-hidden rounded-xl transition-all duration-500 opacity-0 scale-95">
-            </div>
-
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-xl font-bold text-stone-800 flex items-center gap-2">
                 Mural de Caronas
@@ -75,14 +76,24 @@
         <div id="ridesContainer" class="space-y-4">
             </div>
     </main>
-    <footer class="bg-gray-100 border-t border-stone-200 py-6 mt-auto">
-        <div class="max-w-3xl mx-auto px-4 text-center">
-            <p class="text-sm text-gray-500 mb-2">Feito com 💚 e solidariedade.</p>
-            <a href="https://zeballos.com.br" target="_blank" class="text-xs text-gray-400 hover:text-green-600 transition font-medium">
-                &copy; <span id="year"></span> Zeballos Tecnologia
+<footer class="bg-gray-100 border-t border-stone-200 py-8 mt-auto">
+    <div class="max-w-3xl mx-auto px-4 text-center">
+        
+        <div class="flex flex-wrap justify-center gap-3 mb-6">
+            <a href="ajuda.html" class="inline-flex items-center gap-1 text-green-700 font-bold hover:bg-green-100 bg-green-50 px-4 py-2 rounded-lg text-sm border border-green-100 transition">
+                ❓ Como usar
+            </a>
+            <a href="termos.html" class="inline-flex items-center gap-1 text-stone-600 font-medium hover:bg-stone-200 bg-stone-100 px-4 py-2 rounded-lg text-sm border border-stone-200 transition">
+                ⚖️ Termos e Segurança
             </a>
         </div>
-    </footer>
+
+        <p class="text-sm text-gray-500 mb-1">Conexão Chapada - Beta</p>
+        <a href="https://zeballos.com.br" target="_blank" class="text-xs text-gray-400 hover:text-green-600 transition font-medium">
+            &copy; <span id="year"></span> Zeballos Tecnologia
+        </a>
+    </div>
+</footer>
     <script src="app.js"></script>
 </body>
 </html>

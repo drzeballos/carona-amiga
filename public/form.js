@@ -1,10 +1,11 @@
 console.log("🔥 Form v2 carregado");
 
-// === SISTEMA DE DESTAQUES (COM TRANSIÇÃO SUAVE) ===
+// === SISTEMA DE DESTAQUES (CORRIGIDO: SEM MARGEM NO TOPO) ===
 async function iniciarDestaques() {
     const container = document.getElementById("highlightContainer");
     if (!container) return;
 
+    // Adiciona transição suave
     container.classList.add("transition-all", "duration-500", "ease-in-out");
 
     try {
@@ -17,6 +18,7 @@ async function iniciarDestaques() {
         let timer = null;
 
         function exibirDestaque() {
+            // Efeito de saída (fade out)
             container.classList.add('opacity-0', 'scale-95');
 
             setTimeout(() => {
@@ -29,8 +31,10 @@ async function iniciarDestaques() {
                     </a>
                 `;
                 
-                container.className = "mt-8 relative transition-all duration-500 ease-in-out transform";
+                // 🛠️ CORREÇÃO AQUI: Mudamos de 'mt-8' para 'mb-6' para ficar igual à Home
+                container.className = "mb-6 relative transition-all duration-500 ease-in-out transform";
 
+                // Efeito de entrada (fade in)
                 requestAnimationFrame(() => {
                     container.classList.remove('opacity-0', 'scale-95');
                 });
@@ -53,7 +57,7 @@ async function iniciarDestaques() {
 
 iniciarDestaques();
 
-// === RESTO DO CÓDIGO ===
+// === RESTO DO CÓDIGO (Igual ao anterior) ===
 
 document.getElementById("year").textContent = new Date().getFullYear();
 
@@ -105,7 +109,7 @@ rideForm.addEventListener("submit", async (e) => {
     type: tipoURL,
     name: document.getElementById("name").value.trim(),
     phone: document.getElementById("phone").value.trim(),
-    secret_code: document.getElementById("secret_code").value.trim(), // <--- NOVO: Pegamos o PIN aqui
+    secret_code: document.getElementById("secret_code").value.trim(), 
     origin: origin,
     destination: destination,
     date: document.getElementById("data").value,

@@ -31,7 +31,6 @@ async function loadSingleRide() {
         const ride = await res.json();
 
         // 3. Renderiza o Card
-        const tipoTermo = ride.type === 'offer' ? 'OFEREÇO' : 'PROCURO';
         const valorFormatado = parseFloat(ride.price).toFixed(2).replace('.', ',');
         
         let opcionais = [];
@@ -41,7 +40,8 @@ async function loadSingleRide() {
         if (ride.baggage) opcionais.push("Mala Grande");
         const textoOpcionais = opcionais.length > 0 ? opcionais.join(', ') : "Nenhum opcional";
 
-        const whatsappMsg = `Olá *${ride.name}*! Vi seu anúncio de *${tipoTermo}* no Conexão Chapada!
+        // 💬 MENSAGEM WHATSAPP SIMPLIFICADA
+        const whatsappMsg = `Olá *${ride.name}*! Vi seu anúncio no Conexão Chapada.
 De: ${ride.origin}
 Para: ${ride.destination}
 Data: ${formatDateBR(ride.date)} às ${ride.time}
@@ -114,8 +114,6 @@ https://conexaochapada.bots.at.eu.org/carona.html?id=${ride.Id}
     }
 }
 
-// ... (código anterior igual) ...
-
 // === FUNÇÃO DE DELETAR INTELIGENTE ===
 async function deletarCarona(id) {
     if (!confirm("Tem certeza que deseja apagar este anúncio?")) return;
@@ -170,4 +168,5 @@ async function deletarCarona(id) {
 }
 
 window.deletarCarona = deletarCarona;
+
 loadSingleRide();

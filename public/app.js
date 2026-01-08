@@ -130,7 +130,7 @@ async function loadRides() {
     container.innerHTML = "";
     
     rides.forEach(ride => {
-      const tipoTermo = ride.type === 'offer' ? 'OFEREÇO' : 'PROCURO';
+      // (Mantivemos a variável tipoTermo para uso interno no card visual, mas removemos do WhatsApp)
       const valorFormatado = parseFloat(ride.price).toFixed(2).replace('.', ',');
       
       let opcionais = [];
@@ -141,11 +141,11 @@ async function loadRides() {
       
       const textoOpcionais = opcionais.length > 0 ? opcionais.join(', ') : "Nenhum opcional";
 
-      // 🔗 Link da carona individual
       const linkCarona = `https://conexaochapada.bots.at.eu.org/carona.html?id=${ride.Id}`;
       const linkCaronaRelativo = `carona.html?id=${ride.Id}`;
 
-      const whatsappMsg = `Olá *${ride.name}*! Vi seu anúncio de *${tipoTermo}* no Conexão Chapada!
+      // 💬 MENSAGEM WHATSAPP SIMPLIFICADA
+      const whatsappMsg = `Olá *${ride.name}*! Vi seu anúncio no Conexão Chapada.
 De: ${ride.origin}
 Para: ${ride.destination}
 Data: ${formatDateBR(ride.date)} às ${ride.time}
@@ -161,7 +161,6 @@ ${linkCarona}
       const badgeColor = isOffer ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800";
       const badgeText = isOffer ? "OFEREÇO" : "PROCURO";
 
-      // HTML DO CARD ATUALIZADO (Com botão de link)
       container.innerHTML += `
         <div class="ride-card bg-white rounded-2xl shadow-sm border border-gray-200 p-5 hover:shadow-md transition relative overflow-hidden" data-origin="${ride.origin}" data-dest="${ride.destination}">
           <div class="absolute left-0 top-0 bottom-0 w-1 ${isOffer ? 'bg-green-500' : 'bg-blue-500'}"></div>

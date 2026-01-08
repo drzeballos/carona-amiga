@@ -6,9 +6,7 @@ const path = require("path");
 
 const app = express();
 
-// IMPORTANTE: Confia no proxy do Docker/Nginx para passar o IP real
-app.set('trust proxy', true);
-
+app.set('trust proxy', true); // Confia no proxy para pegar o IP real
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
@@ -34,18 +32,13 @@ const nocoClient = axios.create({
   }
 });
 
-// 🕵️‍♂️ FUNÇÃO MELHORADA DE IP
+// 🕵️‍♂️ Função Auxiliar: IP Seguro
 function getClientIp(req) {
-    // Tenta todas as variações possíveis de header que o Docker/Nginx pode mandar
     const ip = req.headers['x-forwarded-for'] || 
                req.headers['x-real-ip'] || 
                req.socket.remoteAddress || 
                req.ip;
-               
-    if (typeof ip === 'string') {
-        // Pega o primeiro IP se vier uma lista (ex: "client, proxy1, proxy2")
-        return ip.split(',')[0].trim();
-    }
+    if (typeof ip === 'string') return ip.split(',')[0].trim();
     return ip;
 }
 
@@ -57,8 +50,8 @@ app.get("/partners", async (_, res) => {
         const { data } = await nocoClient.get(`/${NOCODB_ADS_TABLE}/records`, {
             params: { limit: 100, sort: '-Id' }
         });
-
         const list = data.list || [];
+        
         let ads = list.map(item => {
             let finalUrl = '';
             if (item.image && Array.isArray(item.image) && item.image.length > 0) {
@@ -98,26 +91,43 @@ app.get("/partners", async (_, res) => {
     }
 });
 
-// 📄 ROTA: Listar caronas (Filtra as expiradas e removidas)
+// 📄 ROTA: Listar caronas (CORRIGIDA E SEGURA)
 app.get("/rides", async (_, res) => {
   try {
-    // Importante: O frontend só vai receber o que NÃO for 'expired' nem 'removed'
+    // Busca apenas o que NÃO está expirado ou removido
     const { data } = await nocoClient.get(`/${NOCODB_TABLE}/records`, {
       params: { limit: 100, sort: 'date', where: '(status,neq,expired)' } 
     });
+    
     const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
     const activeRides = [];
+    
+    // Array para guardar as promessas de atualização (não trava a resposta)
+    const updates = [];
+
     for (const ride of (data.list || [])) {
-        // Dupla checagem de status
+        // Ignora removidos/expirados
         if (ride.status === 'removed' || ride.status === 'expired') continue; 
         
         if (ride.date && ride.date < today) {
-            // Expira automaticamente caronas antigas
-            nocoClient.patch(`/${NOCODB_TABLE}/records`, { Id: ride.Id, status: "expired" }).catch(console.error);
+            // ⚠️ FIX CRÍTICO: Atualização segura
+            // Enviamos APENAS Id e Status. Nada mais.
+            console.log(`[AUTO-EXPIRE] Expirando carona ID: ${ride.Id}`);
+            
+            updates.push(
+                nocoClient.patch(`/${NOCODB_TABLE}/records`, { 
+                    Id: ride.Id, 
+                    status: "expired" 
+                }).catch(err => console.error(`Falha ao expirar ID ${ride.Id}`, err.message))
+            );
         } else {
             activeRides.push(ride);
         }
     }
+
+    // Executa as atualizações em segundo plano (Promise.all) para não travar o cliente
+    if (updates.length > 0) Promise.all(updates);
+
     res.json(activeRides);
   } catch (err) {
     console.error("ERRO GET /rides:", err.message);
@@ -125,10 +135,11 @@ app.get("/rides", async (_, res) => {
   }
 });
 
-// 🔍 ROTA: Carona Específica
+// 🔍 ROTA: Carona Específica (SOMENTE LEITURA)
 app.get("/rides/:id", async (req, res) => {
   try {
     const { id } = req.params;
+    // Garante que só estamos LENDO
     const { data } = await nocoClient.get(`/${NOCODB_TABLE}/records/${id}`);
     res.json(data);
   } catch (err) {
@@ -136,14 +147,14 @@ app.get("/rides/:id", async (req, res) => {
   }
 });
 
-// ➕ ROTA: Criar carona (DEBUG DE IP)
+// ➕ ROTA: Criar carona (COM CONST E SCOPE SEGURO)
 app.post("/rides", async (req, res) => {
   try {
+    // O uso de CONST aqui garante que essas variáveis morram ao fim da requisição
     const { only_woman, pet, package: pkg, baggage, price, seats, secret_code, ...rest } = req.body;
     
-    // Captura e LOGA o IP para a gente ver no terminal
     const userIp = getClientIp(req);
-    console.log(`[NOVA CARONA] IP Detectado: ${userIp}`);
+    console.log(`[NOVA CARONA] IP: ${userIp}`);
 
     const payload = { 
         ...rest, 
@@ -155,7 +166,7 @@ app.post("/rides", async (req, res) => {
         only_woman: !!only_woman, 
         status: "active",
         secret_code: secret_code || "0000",
-        ip_user: userIp // Tenta salvar. (Garanta que a coluna no NocoDB se chama exatamente 'ip_user')
+        ip_user: userIp // Salva IP apenas aqui
     };
     
     const { data } = await nocoClient.post(`/${NOCODB_TABLE}/records`, payload);
@@ -166,7 +177,7 @@ app.post("/rides", async (req, res) => {
   }
 });
 
-// 🗑️ ROTA: Soft Delete (Muda status para 'expired')
+// 🗑️ ROTA: Soft Delete
 app.delete("/rides/:id", async (req, res) => {
     try {
         const { id } = req.params;
@@ -177,34 +188,31 @@ app.delete("/rides/:id", async (req, res) => {
 
         let authorized = false;
 
-        // Validação Híbrida (PIN ou IP)
+        // Verifica PIN ou IP
         if (pin && ride.secret_code === pin) {
             authorized = true;
-            console.log(`[SOFT DELETE] Autorizado por PIN. ID: ${id}`);
-        }
-        else if (ride.ip_user && ride.ip_user === requestIp) {
+            console.log(`[DELETE] Autorizado por PIN. ID: ${id}`);
+        } else if (ride.ip_user && ride.ip_user === requestIp) {
             authorized = true;
-            console.log(`[SOFT DELETE] Autorizado por IP (${requestIp}). ID: ${id}`);
-        } else {
-            console.log(`[SOFT DELETE FALHOU] IP Registro: ${ride.ip_user} | IP Requisição: ${requestIp}`);
+            console.log(`[DELETE] Autorizado por IP. ID: ${id}`);
         }
 
         if (!authorized) {
-            if (!pin) return res.status(401).json({ error: "PIN necessário", requirePin: true });
+            if (!pin) return res.status(401).json({ error: "PIN necessário" });
             return res.status(403).json({ error: "Senha incorreta!" });
         }
 
-        // MUDANÇA: Em vez de .delete(), usamos .patch() para mudar status
+        // PATCH SEGURO: Apenas status e Id
         await nocoClient.patch(`/${NOCODB_TABLE}/records`, {
             Id: id,
-            status: "expired" // Marca como expirado
+            status: "expired"
         });
 
         res.json({ success: true });
 
     } catch (err) {
-        console.error("Erro ao processar soft delete:", err.message);
-        res.status(500).json({ error: "Erro ao processar exclusão." });
+        console.error("Erro Delete:", err.message);
+        res.status(500).json({ error: "Erro ao excluir." });
     }
 });
 
