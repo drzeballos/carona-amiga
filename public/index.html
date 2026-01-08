@@ -3,76 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conexão Chapada</title>
-    
-    <meta property="og:title" content="Conexão Chapada - Caronas Solidárias">
-    <meta property="og:description" content="Encontre ou ofereça caronas entre Brasília, Goiânia e a Chapada dos Veadeiros de forma fácil e rápida!">
+    <title>Conexão Chapada - Caronas Solidárias</title>
+    <meta name="description" content="Conectando viajantes entre Brasília, Goiânia e a Chapada dos Veadeiros. Encontre ou ofereça caronas de forma simples e solidária.">
+
+    <meta property="og:site_name" content="Conexão Chapada">
+    <meta property="og:title" content="Conexão Chapada - Sua próxima viagem começa aqui!">
+    <meta property="og:description" content="Encontre caronas solidárias para a Chapada dos Veadeiros. Rápido, fácil e sem burocracia.">
     <meta property="og:image" content="https://conexaochapada.bots.at.eu.org/img/conexao-chapada-foto.jpeg">
-    <meta property="og:url" content="https://conexaochapada.bots.at.eu.org/">
+    <meta property="og:image:type" content="image/jpeg">
     <meta property="og:type" content="website">
-    <meta name="theme-color" content="#15803d"> 
-    
+    <meta property="og:url" content="https://conexaochapada.bots.at.eu.org/">
+
+    <meta name="theme-color" content="#15803d">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" href="/favicon.ico">
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col selection:bg-green-200">
-
+<body class="bg-stone-50 text-stone-800 font-sans min-h-screen flex flex-col selection:bg-green-200">
     <header class="bg-gradient-to-r from-green-700 to-green-500 text-white shadow-lg sticky top-0 z-50">
         <div class="max-w-3xl mx-auto px-4 py-6 flex justify-between items-center">
-            <a href="/" class="text-xl font-bold tracking-tight hover:opacity-90 transition flex items-center gap-2">
-                Conexão Chapada
-            </a>
-            
-            <div class="space-x-2">
-                <a href="form.html?type=offer" class="px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-sm font-medium transition border border-white/10">Oferecer</a>
-                <a href="form.html?type=request" class="px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-sm font-medium transition border border-white/10">Solicitar</a>
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight flex items-center gap-2">
+                    Conexão Chapada <span class="text-xs bg-white/20 px-2 py-1 rounded-full uppercase tracking-wider">Beta</span>
+                </h1>
+                <p class="text-sm text-green-100 mt-1 opacity-90">Caronas solidárias num pulo!</p>
+            </div>
+            <div class="space-x-2 flex">
+                <a href="form.html?type=offer" class="px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-sm font-bold transition border border-white/10 shadow-sm hidden md:block">Oferecer</a>
+                <a href="form.html?type=request" class="px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-sm font-bold transition border border-white/10 shadow-sm hidden md:block">Solicitar</a>
             </div>
         </div>
     </header>
 
     <main class="max-w-3xl mx-auto px-4 py-6 w-full flex-1">
+        
+        <div class="grid grid-cols-2 gap-4 mb-8 md:hidden">
+            <a href="form.html?type=offer" class="flex flex-col items-center justify-center bg-green-600 text-white p-4 rounded-2xl shadow-lg hover:bg-green-700 transition border-b-4 border-green-800 active:border-b-0 active:translate-y-1">
+                <span class="text-3xl mb-2">🚙</span>
+                <span class="font-bold">Oferecer Carona</span>
+            </a>
+            <a href="form.html?type=request" class="flex flex-col items-center justify-center bg-blue-600 text-white p-4 rounded-2xl shadow-lg hover:bg-blue-700 transition border-b-4 border-blue-800 active:border-b-0 active:translate-y-1">
+                <span class="text-3xl mb-2">🙋‍♀️</span>
+                <span class="font-bold">Pedir Carona</span>
+            </a>
+        </div>
 
-        <div id="highlightContainer" class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-6 text-center relative overflow-hidden transition-all duration-500">
-            <div id="adDefaultContent" class="border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 h-32 flex flex-col items-center justify-center text-gray-400 gap-2 hover:bg-gray-100 transition cursor-pointer">
-                <span class="text-2xl">🤝</span>
-                <span class="font-medium">Nossos Parceiros</span>
-                <a href="https://wa.me/5561998668276?text=Quero%20anunciar%20no%20Conexão%20Chapada!" 
-                   target="_blank"
-                   class="text-xs text-green-600 font-bold underline hover:text-green-800">
-                    Divulgue seu negócio aqui
-                </a>
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-stone-200 mb-6 flex flex-col md:flex-row gap-3">
+            <div class="flex-1">
+                <label for="filterOrigin" class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 ml-1">Origem</label>
+                <select id="filterOrigin" class="w-full p-3 border border-stone-200 rounded-xl bg-stone-50 text-stone-700 font-medium focus:ring-2 focus:ring-green-500 outline-none transition appearance-none" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27292.4%27%20height%3D%27292.4%27%3E%3Cpath%20fill%3D%27%23134e4a%27%20d%3D%27M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-13%205.4A17.6%2017.6%200%200%200%200%2087.2c0%205%201.8%209.3%205.4%2013l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%20100.3c3.6-3.6%205.4-7.8%205.4-12.8%200-5-1.8-9.3-5.4-13z%27%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 0.8rem;">
+                    <option value="">Todas as Origens</option>
+                </select>
+            </div>
+            <div class="flex-1">
+                <label for="filterDestination" class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 ml-1">Destino</label>
+                <select id="filterDestination" class="w-full p-3 border border-stone-200 rounded-xl bg-stone-50 text-stone-700 font-medium focus:ring-2 focus:ring-green-500 outline-none transition appearance-none" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27292.4%27%20height%3D%27292.4%27%3E%3Cpath%20fill%3D%27%23134e4a%27%20d%3D%27M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-13%205.4A17.6%2017.6%200%200%200%200%2087.2c0%205%201.8%209.3%205.4%2013l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%20100.3c3.6-3.6%205.4-7.8%205.4-12.8%200-5-1.8-9.3-5.4-13z%27%2F%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 0.8rem;">
+                    <option value="">Todos os Destinos</option>
+                </select>
             </div>
         </div>
 
-        <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 mb-6 sticky top-24 z-40">
-            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Filtrar Caronas</h3>
-            <div class="flex flex-col md:flex-row gap-3">
-                <select id="filterOrigin" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 outline-none transition">
-                    <option value="">🏠 Todas as Origens</option>
-                </select>
-                <select id="filterDestination" class="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-green-500 outline-none transition">
-                    <option value="">🏁 Todos os Destinos</option>
-                </select>
+        <div id="highlightContainer" class="mb-6 relative overflow-hidden rounded-xl transition-all duration-500 opacity-0 scale-95">
             </div>
+
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold text-stone-800 flex items-center gap-2">
+                Mural de Caronas
+            </h2>
+            <span id="rideCount" class="text-sm font-medium text-green-600 bg-green-50 px-3 py-1 rounded-full border border-green-100">Carregando...</span>
         </div>
 
-        <h2 class="text-xl font-bold text-gray-700 mb-4 px-1 flex justify-between items-center">
-            Últimas Caronas
-            <span id="rideCount" class="text-sm font-normal text-gray-400 bg-gray-200 px-2 py-1 rounded-lg">Loading...</span>
-        </h2>
-
-        <div id="ridesContainer" class="space-y-4 pb-6"></div>
-
+        <div id="ridesContainer" class="space-y-4">
+            </div>
     </main>
-
-    <footer class="bg-gray-100 border-t border-gray-200 py-4 mt-auto">
-        <div class="text-center">
+    <footer class="bg-gray-100 border-t border-stone-200 py-6 mt-auto">
+        <div class="max-w-3xl mx-auto px-4 text-center">
+            <p class="text-sm text-gray-500 mb-2">Feito com 💚 e solidariedade.</p>
             <a href="https://zeballos.com.br" target="_blank" class="text-xs text-gray-400 hover:text-green-600 transition font-medium">
                 &copy; <span id="year"></span> Zeballos Tecnologia
             </a>
         </div>
     </footer>
-
-    <script src="app.js" charset="UTF-8"></script>
+    <script src="app.js"></script>
 </body>
 </html>

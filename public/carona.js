@@ -11,7 +11,7 @@ function formatDateBR(dateStr) {
 async function loadSingleRide() {
     const container = document.getElementById("singleRideContainer");
     
-    // 1. Pega o ID da URL (ex: carona.html?id=10)
+    // 1. Pega o ID da URL
     const params = new URLSearchParams(window.location.search);
     const id = params.get("id");
 
@@ -30,7 +30,7 @@ async function loadSingleRide() {
 
         const ride = await res.json();
 
-        // 3. Renderiza o Card (Mesma lógica do app.js)
+        // 3. Renderiza o Card
         const tipoTermo = ride.type === 'offer' ? 'OFEREÇO' : 'PROCURO';
         const valorFormatado = parseFloat(ride.price).toFixed(2).replace('.', ',');
         
@@ -88,6 +88,13 @@ https://conexaochapada.bots.at.eu.org/carona.html?id=${ride.Id}
           <a href="${whatsappUrl}" target="_blank" class="flex items-center justify-center gap-2 w-full bg-green-600 text-white py-4 rounded-xl hover:bg-green-700 font-bold transition shadow-green-100 shadow-lg text-lg">
             Chamar no WhatsApp
           </a>
+
+          <div class="mt-6 pt-4 border-t border-gray-100 text-center">
+             <button onclick="deletarCarona('${ride.Id}')" class="text-red-400 text-sm font-medium hover:text-red-600 underline transition cursor-pointer flex items-center justify-center gap-1 mx-auto">
+                 🗑️ Apagar este anúncio
+             </button>
+          </div>
+
         </div>
         
         <div class="mt-4 text-center text-xs text-gray-400">
@@ -107,4 +114,60 @@ https://conexaochapada.bots.at.eu.org/carona.html?id=${ride.Id}
     }
 }
 
+// ... (código anterior igual) ...
+
+// === FUNÇÃO DE DELETAR INTELIGENTE ===
+async function deletarCarona(id) {
+    if (!confirm("Tem certeza que deseja apagar este anúncio?")) return;
+
+    // 1. TENTATIVA MÁGICA (Sem PIN, confiando no IP)
+    try {
+        const res = await fetch(`/rides/${id}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({}) // Manda corpo vazio (sem PIN)
+        });
+
+        const data = await res.json();
+
+        // Se funcionou de primeira (IP bateu!)
+        if (res.ok) {
+            alert("✨ Reconhecemos seu dispositivo! Anúncio removido com sucesso!");
+            window.location.href = "/";
+            return;
+        }
+
+        // Se o servidor pediu PIN (Erro 401 - Unauthorized)
+        if (res.status === 401) {
+            // 2. TENTATIVA MANUAL (Pede o PIN)
+            const pin = prompt("🔒 Dispositivo diferente detectado. Digite sua senha (PIN):");
+            if (!pin) return; // Cancelou
+
+            const res2 = await fetch(`/rides/${id}`, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ pin: pin }) // Agora manda o PIN
+            });
+
+            const data2 = await res2.json();
+
+            if (res2.ok) {
+                alert("✅ Anúncio removido com sucesso!");
+                window.location.href = "/";
+            } else {
+                alert("❌ Erro: " + (data2.error || "Senha incorreta"));
+            }
+            return;
+        }
+
+        // Outros erros
+        alert("❌ Erro: " + (data.error || "Falha desconhecida"));
+
+    } catch (err) {
+        console.error(err);
+        alert("Erro de conexão ao tentar excluir.");
+    }
+}
+
+window.deletarCarona = deletarCarona;
 loadSingleRide();

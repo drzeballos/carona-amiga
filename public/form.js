@@ -1,11 +1,10 @@
 console.log("🔥 Form v2 carregado");
 
-// === SISTEMA DE DESTAQUES (CORRIGIDO: LIMPEZA TOTAL + IMAGEM FULL) ===
+// === SISTEMA DE DESTAQUES (COM TRANSIÇÃO SUAVE) ===
 async function iniciarDestaques() {
     const container = document.getElementById("highlightContainer");
     if (!container) return;
 
-    // Transição base
     container.classList.add("transition-all", "duration-500", "ease-in-out");
 
     try {
@@ -18,14 +17,11 @@ async function iniciarDestaques() {
         let timer = null;
 
         function exibirDestaque() {
-            // 1. Efeito de Saída
             container.classList.add('opacity-0', 'scale-95');
 
             setTimeout(() => {
                 const item = destaques[indexAtual];
                 
-                // 2. Troca o HTML
-                // w-full h-auto: Imagem se ajusta à largura e define sua própria altura (não corta)
                 container.innerHTML = `
                     <a href="${item.link}" target="_blank" class="block w-full h-full relative group">
                         <img src="${item.img}" alt="Destaque" class="w-full h-auto rounded-xl shadow-sm transition transform group-hover:scale-[1.01]">
@@ -33,12 +29,8 @@ async function iniciarDestaques() {
                     </a>
                 `;
                 
-                // 3. LIMPEZA RADICAL
-                // Substitui todas as classes do container para remover estilos de "caixa branca"
-                // mt-8: margem superior necessária no form
                 container.className = "mt-8 relative transition-all duration-500 ease-in-out transform";
 
-                // 4. Efeito de Entrada
                 requestAnimationFrame(() => {
                     container.classList.remove('opacity-0', 'scale-95');
                 });
@@ -61,7 +53,7 @@ async function iniciarDestaques() {
 
 iniciarDestaques();
 
-// === RESTO DO CÓDIGO (MANTENHA IGUAL) ===
+// === RESTO DO CÓDIGO ===
 
 document.getElementById("year").textContent = new Date().getFullYear();
 
@@ -70,7 +62,7 @@ const CIDADES = [
   "Teresina de Goiás", "Vila de São Jorge", "São Gabriel da Cachoeira",
   "Aeroporto de Brasília", "Rodoviária Interestadual de Brasília",
   "Rodoviária do Plano Piloto", "Alto Paraíso", "São João da Aliança",
-  "Budega do Jacaré - Km 12 GO-239",
+  "Bar do Jacaré - Km 12 GO-239",
   "Colinas do Sul"
 ];
 
@@ -113,6 +105,7 @@ rideForm.addEventListener("submit", async (e) => {
     type: tipoURL,
     name: document.getElementById("name").value.trim(),
     phone: document.getElementById("phone").value.trim(),
+    secret_code: document.getElementById("secret_code").value.trim(), // <--- NOVO: Pegamos o PIN aqui
     origin: origin,
     destination: destination,
     date: document.getElementById("data").value,
