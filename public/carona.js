@@ -10,8 +10,6 @@ function formatDateBR(dateStr) {
 
 async function loadSingleRide() {
     const container = document.getElementById("singleRideContainer");
-    
-    // 1. Pega o ID da URL
     const params = new URLSearchParams(window.location.search);
     const id = params.get("id");
 
@@ -21,16 +19,11 @@ async function loadSingleRide() {
     }
 
     try {
-        // 2. Busca no Backend
         const res = await fetch(`/rides/${id}`);
         
-        if (!res.ok) {
-            throw new Error("Carona não encontrada");
-        }
+        if (!res.ok) throw new Error("Carona não encontrada");
 
         const ride = await res.json();
-
-        // 3. Renderiza o Card
         const valorFormatado = parseFloat(ride.price).toFixed(2).replace('.', ',');
         
         let opcionais = [];
@@ -40,22 +33,20 @@ async function loadSingleRide() {
         if (ride.baggage) opcionais.push("Mala Grande");
         const textoOpcionais = opcionais.length > 0 ? opcionais.join(', ') : "Nenhum opcional";
 
-        // 💬 MENSAGEM WHATSAPP SIMPLIFICADA
-        const whatsappMsg = `Olá *${ride.name}*! Vi seu anúncio no Conexão Chapada.
-De: ${ride.origin}
-Para: ${ride.destination}
-Data: ${formatDateBR(ride.date)} às ${ride.time}
-Valor: R$ ${valorFormatado}
-Detalhes: ${textoOpcionais}
-
----
-https://conexaochapada.bots.at.eu.org/carona.html?id=${ride.Id}
-\`\`\`Zeballos Tecnologia\`\`\``;
-
+        const whatsappMsg = `Olá *${ride.name}*! Vi seu anúncio no Conexão Chapada.\nDe: ${ride.origin}\nPara: ${ride.destination}\nData: ${formatDateBR(ride.date)} às ${ride.time}\nValor: R$ ${valorFormatado}\nDetalhes: ${textoOpcionais}\n\n---\nhttps://conexaochapada.bots.at.eu.org/carona.html?id=${ride.Id}\n\`\`\`Zeballos Tecnologia\`\`\``;
         const whatsappUrl = `https://wa.me/55${ride.phone.replace(/\D/g, '')}?text=${encodeURIComponent(whatsappMsg)}`;
+        
         const isOffer = ride.type === 'offer';
         const badgeColor = isOffer ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800";
         const badgeText = isOffer ? "OFEREÇO" : "PROCURO";
+        
+        // Dados para o compartilhamento nativo
+        const shareData = {
+            id: ride.Id,
+            origin: ride.origin,
+            dest: ride.destination,
+            type: ride.type
+        };
 
         container.innerHTML = `
         <div class="ride-card bg-white rounded-2xl shadow-xl border border-gray-200 p-6 relative overflow-hidden">
@@ -85,9 +76,15 @@ https://conexaochapada.bots.at.eu.org/carona.html?id=${ride.Id}
             ${ride.baggage ? `<span class="bg-purple-50 text-purple-600 text-xs px-2 py-1 rounded border border-purple-100">🎒 Mala</span>` : ''}
           </div>
 
-          <a href="${whatsappUrl}" target="_blank" class="flex items-center justify-center gap-2 w-full bg-green-600 text-white py-4 rounded-xl hover:bg-green-700 font-bold transition shadow-green-100 shadow-lg text-lg">
-            Chamar no WhatsApp
-          </a>
+          <div class="space-y-3">
+              <a href="${whatsappUrl}" target="_blank" class="flex items-center justify-center gap-2 w-full bg-green-600 text-white py-4 rounded-xl hover:bg-green-700 font-bold transition shadow-green-100 shadow-lg text-lg">
+                Falar no WhatsApp
+              </a>
+
+              <button onclick='compartilharNativo(${JSON.stringify(shareData)})' class="flex items-center justify-center gap-2 w-full bg-blue-50 text-blue-600 border border-blue-100 py-3 rounded-xl hover:bg-blue-100 font-bold transition">
+                🔗 Compartilhar Link
+              </button>
+          </div>
 
           <div class="mt-6 pt-4 border-t border-gray-100 text-center">
              <button onclick="deletarCarona('${ride.Id}')" class="text-red-400 text-sm font-medium hover:text-red-600 underline transition cursor-pointer flex items-center justify-center gap-1 mx-auto">
@@ -114,37 +111,54 @@ https://conexaochapada.bots.at.eu.org/carona.html?id=${ride.Id}
     }
 }
 
-// === FUNÇÃO DE DELETAR INTELIGENTE ===
+// === FUNÇÃO DE COMPARTILHAR NATIVO (NOVA) ===
+async function compartilharNativo(dados) {
+    const url = `https://conexaochapada.bots.at.eu.org/carona.html?id=${dados.id}`;
+    const texto = `${dados.type === 'offer' ? '🚙 Oferta' : '🙋 Pedido'} de Carona: ${dados.origin} -> ${dados.dest}. Acesse:`;
+
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: 'Conexão Chapada',
+                text: texto,
+                url: url
+            });
+        } catch (err) {
+            console.log('User cancelou share');
+        }
+    } else {
+        // Fallback
+        navigator.clipboard.writeText(url).then(() => alert("Link copiado! Pode colar no Telegram/Instagram."));
+    }
+}
+
+// === FUNÇÃO DE DELETAR ===
 async function deletarCarona(id) {
     if (!confirm("Tem certeza que deseja apagar este anúncio?")) return;
 
-    // 1. TENTATIVA MÁGICA (Sem PIN, confiando no IP)
     try {
         const res = await fetch(`/rides/${id}`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({}) // Manda corpo vazio (sem PIN)
+            body: JSON.stringify({}) 
         });
 
         const data = await res.json();
 
-        // Se funcionou de primeira (IP bateu!)
         if (res.ok) {
             alert("✨ Reconhecemos seu dispositivo! Anúncio removido com sucesso!");
             window.location.href = "/";
             return;
         }
 
-        // Se o servidor pediu PIN (Erro 401 - Unauthorized)
         if (res.status === 401) {
-            // 2. TENTATIVA MANUAL (Pede o PIN)
             const pin = prompt("🔒 Dispositivo diferente detectado. Digite sua senha (PIN):");
-            if (!pin) return; // Cancelou
+            if (!pin) return;
 
             const res2 = await fetch(`/rides/${id}`, {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ pin: pin }) // Agora manda o PIN
+                body: JSON.stringify({ pin: pin })
             });
 
             const data2 = await res2.json();
@@ -157,16 +171,12 @@ async function deletarCarona(id) {
             }
             return;
         }
-
-        // Outros erros
         alert("❌ Erro: " + (data.error || "Falha desconhecida"));
-
     } catch (err) {
         console.error(err);
         alert("Erro de conexão ao tentar excluir.");
     }
 }
-
 window.deletarCarona = deletarCarona;
 
 loadSingleRide();

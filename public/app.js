@@ -1,4 +1,4 @@
-console.log("🔥 Frontend v2.2 (Layout Fix) carregado");
+console.log("🔥 Frontend v2.4 (Link Fix) carregado");
 
 document.getElementById("year").textContent = new Date().getFullYear();
 
@@ -31,7 +31,6 @@ async function iniciarDestaques() {
                     </a>
                 `;
 
-                // 🛠️ CORREÇÃO AQUI: O 'mb-6' garante o espaço abaixo do banner
                 container.className = "mb-6 relative transition-all duration-500 ease-in-out transform";
 
                 requestAnimationFrame(() => {
@@ -75,11 +74,10 @@ CIDADES.sort().forEach(c => {
     filterDestination.appendChild(new Option(c, c));
 });
 
-// === NOVA LÓGICA DE FILTRO POR TIPO ===
-let filtroTipoAtual = null; // null = todos, 'offer' = ofertas, 'request' = pedidos
+// === LÓGICA DE FILTRO POR TIPO ===
+let filtroTipoAtual = null;
 
 function filtrarTipo(tipo) {
-    // Se clicar no botão que já está ativo, desativa (volta a mostrar tudo)
     if (filtroTipoAtual === tipo) {
         filtroTipoAtual = null;
     } else {
@@ -92,15 +90,11 @@ function filtrarTipo(tipo) {
 function atualizarBotoesFiltro() {
     const btnOffer = document.getElementById("btnFilterOffer");
     const btnRequest = document.getElementById("btnFilterRequest");
-
-    // Estilo Base (Inativo)
     const baseClass = "px-4 py-2 rounded-xl font-bold text-sm transition border border-transparent bg-gray-100 text-gray-500";
     
-    // Reseta ambos
     btnOffer.className = baseClass + " hover:bg-green-50";
     btnRequest.className = baseClass + " hover:bg-blue-50";
 
-    // Aplica estilo ATIVO (Cores dos Badges)
     if (filtroTipoAtual === 'offer') {
         btnOffer.className = "px-4 py-2 rounded-xl font-bold text-sm transition border border-green-200 bg-green-100 text-green-800 shadow-sm ring-2 ring-green-100";
     }
@@ -108,15 +102,11 @@ function atualizarBotoesFiltro() {
         btnRequest.className = "px-4 py-2 rounded-xl font-bold text-sm transition border border-blue-200 bg-blue-100 text-blue-800 shadow-sm ring-2 ring-blue-100";
     }
 }
-
-// Expõe a função para o HTML poder chamar
 window.filtrarTipo = filtrarTipo;
 
-// === FILTRAGEM GERAL (ORIGEM + DESTINO + TIPO) ===
 function applyFilters() {
     const originVal = filterOrigin.value;
     const destVal = filterDestination.value;
-    
     let visibleCount = 0;
     const container = document.getElementById("ridesContainer");
     const cards = container.getElementsByClassName("ride-card");
@@ -124,12 +114,10 @@ function applyFilters() {
     Array.from(cards).forEach(card => {
         const cardOrigin = card.getAttribute("data-origin");
         const cardDest = card.getAttribute("data-dest");
-        const cardType = card.getAttribute("data-type"); // Pegamos o tipo aqui
+        const cardType = card.getAttribute("data-type");
 
         const matchOrigin = originVal === "" || cardOrigin === originVal;
         const matchDest = destVal === "" || cardDest === destVal;
-        
-        // Novo Filtro de Tipo
         const matchType = filtroTipoAtual === null || cardType === filtroTipoAtual;
 
         if (matchOrigin && matchDest && matchType) {
@@ -182,6 +170,7 @@ async function loadRides() {
       
       const textoOpcionais = opcionais.length > 0 ? opcionais.join(', ') : "Nenhum opcional";
       const linkCaronaRelativo = `carona.html?id=${ride.Id}`;
+      
       const whatsappMsg = `Olá *${ride.name}*! Vi seu anúncio no Conexão Chapada.\nDe: ${ride.origin}\nPara: ${ride.destination}\nData: ${formatDateBR(ride.date)} às ${ride.time}\nValor: R$ ${valorFormatado}\nDetalhes: ${textoOpcionais}\n\n---\nhttps://conexaochapada.bots.at.eu.org/carona.html?id=${ride.Id}\n\`\`\`Zeballos Tecnologia\`\`\``;
       const whatsappUrl = `https://wa.me/55${ride.phone.replace(/\D/g, '')}?text=${encodeURIComponent(whatsappMsg)}`;
       
@@ -223,8 +212,10 @@ async function loadRides() {
 
           <div class="flex gap-2">
              <a href="${whatsappUrl}" target="_blank" class="flex-1 flex items-center justify-center gap-2 bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 font-bold transition shadow-green-100 shadow-lg">WhatsApp</a>
-             <a href="${linkCaronaRelativo}" class="px-4 py-3 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 font-bold transition flex items-center justify-center border border-gray-200" title="Ver detalhes e link">
-                🔗
+             
+             <a href="${linkCaronaRelativo}" 
+                class="flex-1 px-4 py-3 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 font-bold transition flex items-center justify-center border border-gray-200 gap-2">
+                🔗 Ver / Compartilhar
              </a>
           </div>
 
