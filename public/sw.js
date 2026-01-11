@@ -1,5 +1,5 @@
 // 🔥 SEMPRE QUE ATUALIZAR O APP, MUDE ESTE NÚMERO AQUI!
-const CACHE_NAME = "conexao-chapada-v2.5"; // <--- MUDAR ISSO AQUI
+const CACHE_NAME = "conexao-chapada-v1.0-final"; // Ou v2.7 - <--- MUDAR ISSO AQUI SEMPRE QUE MUDAR OS ARQUIVOS
 
 const ASSETS = [
   "/",

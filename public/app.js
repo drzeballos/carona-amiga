@@ -1,4 +1,4 @@
-console.log("🔥 Frontend v2.4 (Link Fix) carregado");
+console.log("🔥 Frontend v2.7 (City Fix & Bold Borders) carregado");
 
 document.getElementById("year").textContent = new Date().getFullYear();
 
@@ -55,17 +55,17 @@ async function iniciarDestaques() {
 }
 iniciarDestaques();
 
-// === CIDADES E FILTROS ===
+// === CIDADES E FILTROS (LISTA ATUALIZADA) ===
 const CIDADES = [
   "Brasília", "Goiânia", "Anápolis", "Formosa", "Cavalcante",
   "Teresina de Goiás", "Vila de São Jorge", "São Gabriel da Cachoeira",
   "Aeroporto de Brasília", "Rodoviária Interestadual de Brasília",
   "Rodoviária do Plano Piloto", "Alto Paraíso", "São João da Aliança",
-  "Budega do Jacaré - Km 12 GO-239",
+  "Budega do Jacaré - Km 12 GO-239", // <-- Corrigido
   "Colinas do Sul",
-  "Sobradinho",
-  "Planaltina",
-  "Pirenópolis"
+  "Sobradinho",   // <-- Novo
+  "Planaltina",   // <-- Novo
+  "Pirenópolis"   // <-- Novo
 ];
 
 const filterOrigin = document.getElementById("filterOrigin");
@@ -187,10 +187,9 @@ async function loadRides() {
              data-dest="${ride.destination}" 
              data-type="${ride.type}">
              
-          <div class="absolute left-0 top-0 bottom-0 w-1 ${isOffer ? 'bg-green-500' : 'bg-blue-500'}"></div>
+          <div class="absolute left-0 top-0 bottom-0 w-2 ${isOffer ? 'bg-green-500' : 'bg-blue-500'}"></div>
           
-          <div class="flex justify-between items-start mb-3 pl-2">
-            <div>
+          <div class="flex justify-between items-start mb-3 pl-3"> <div>
                 <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2">${ride.name || "Viajante"} ${ride.only_woman ? '<span title="Exclusivo para Mulheres">👩</span>' : ''}</h3>
                 <span class="${badgeColor} text-xs px-2 py-1 rounded font-bold uppercase tracking-wide">${badgeText}</span>
             </div>
@@ -200,12 +199,12 @@ async function loadRides() {
             </div>
           </div>
 
-          <div class="mb-4 text-sm text-gray-600 space-y-1 pl-2 border-l-2 border-gray-100 ml-1">
+          <div class="mb-4 text-sm text-gray-600 space-y-1 pl-3 border-l-2 border-gray-100 ml-1">
             <p class="flex items-center gap-2"><span class="text-gray-400">Origem:</span> <strong class="text-gray-800">${ride.origin}</strong></p>
             <p class="flex items-center gap-2"><span class="text-gray-400">Destino:</span> <strong class="text-gray-800">${ride.destination}</strong></p>
           </div>
 
-          <div class="flex gap-2 flex-wrap mb-4 pl-2">
+          <div class="flex gap-2 flex-wrap mb-4 pl-3">
             ${ride.only_woman ? `<span class="bg-pink-100 text-pink-700 text-xs px-2 py-1 rounded border border-pink-200 font-bold">👩 Só Mulheres</span>` : ''}
             ${ride.seats ? `<span class="bg-gray-50 text-gray-600 text-xs px-2 py-1 rounded border border-gray-200">💺 ${ride.seats} vagas</span>` : ''}
             ${ride.pet ? `<span class="bg-orange-50 text-orange-600 text-xs px-2 py-1 rounded border border-orange-100">🐶 Pet</span>` : ''}
@@ -215,7 +214,6 @@ async function loadRides() {
 
           <div class="flex gap-2">
              <a href="${whatsappUrl}" target="_blank" class="flex-1 flex items-center justify-center gap-2 bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 font-bold transition shadow-green-100 shadow-lg">WhatsApp</a>
-             
              <a href="${linkCaronaRelativo}" 
                 class="flex-1 px-4 py-3 bg-gray-100 text-gray-600 rounded-xl hover:bg-gray-200 font-bold transition flex items-center justify-center border border-gray-200 gap-2">
                 🔗 Ver / Compartilhar
